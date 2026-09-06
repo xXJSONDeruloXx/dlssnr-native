@@ -1,0 +1,27 @@
+name: linux-runtime-ci
+
+on:
+  push:
+    branches:
+      - feat/linux-shared-runtime
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libvulkan-dev glslc
+      - name: Run host tests
+        run: make test
+      - name: Build shared runtime
+        run: make -C native
+      - name: Inspect exported ABI
+        run: |
+          test -f native/build/libdlssnr-native.so
+          nm -D --defined-only native/build/libdlssnr-native.so | grep ' dlssnr_abi_version$'
+          nm -D --defined-only native/build/libdlssnr-native.so | grep ' dlssnr_model_open$'
+          nm -D --defined-only native/build/libdlssnr-native.so | grep ' dlssnr_runtime_create$'
