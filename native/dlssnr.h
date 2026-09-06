@@ -31,6 +31,13 @@ typedef struct {
     uint32_t reset;
 } dlssnr_stage1_profile;
 
+typedef struct {
+    uint32_t model_tensors;
+    uint32_t required_tensors;
+    uint32_t present_required_tensors;
+    uint32_t auxiliary_tensors;
+} dlssnr_stage1_inventory;
+
 uint32_t dlssnr_abi_version(void);
 int dlssnr_model_open(const char *path, dlssnr_model **out);
 void dlssnr_model_close(dlssnr_model *model);
@@ -41,6 +48,7 @@ const char *dlssnr_model_weights_sha256(const dlssnr_model *model);
 const char *dlssnr_model_tensor_name(const dlssnr_model *model, uint32_t index);
 const void *dlssnr_model_tensor_at(const dlssnr_model *model, uint32_t index, size_t *size);
 const void *dlssnr_model_tensor(const dlssnr_model *model, const char *name, size_t *size);
+int dlssnr_model_stage1_inventory(const dlssnr_model *model, dlssnr_stage1_inventory *inventory);
 
 int dlssnr_runtime_create(dlssnr_runtime **out);
 void dlssnr_runtime_destroy(dlssnr_runtime *runtime);
