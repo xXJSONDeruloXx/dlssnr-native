@@ -2,6 +2,7 @@
 #include "model_dll.h"
 #include "model_package.h"
 #include "runtime.h"
+#include "stage1_graph.h"
 #include <stdlib.h>
 
 struct dlssnr_model {
@@ -82,6 +83,23 @@ const void *dlssnr_model_tensor(const dlssnr_model *model, const char *name, siz
         ? nr_model_package_tensor(model->u.package,name,size)
         : nr_model_dll_tensor(model->u.dll,name,size);
 }
+int dlssnr_model_stage1_inventory(const dlssnr_model *model, dlssnr_stage1_inventory *inventory) {
+    if (!model || !inventory) return DLSSNR_ERROR_INVALID_ARGUMENT;
+    uint32_t present=0;
+    char name[64];
+    for (uint32_t i=0;i<nr_stage1_required_tensor_count();i++) {
+        if (nr_stage1_required_tensor(i,name,sizeof(name),NULL))
+            return DLSSNR_ERROR_MODEL;
+        size_t size=0;
+        if (dlssnr_model_tensor(model,name,&size) && size) present++;
+    }
+    uint32_t total=dlssnr_model_tensor_count(model);
+    inventory->model_tensors=total;
+    inventory->required_tensors=nr_stage1_required_tensor_count();
+    inventory->present_required_tensors=present;
+    inventory->auxiliary_tensors=total>=present?total-present:0;
+    return DLSSNR_OK;
+}
 
 int dlssnr_runtime_create(dlssnr_runtime **out) {
     if (!out) return DLSSNR_ERROR_INVALID_ARGUMENT;
@@ -105,6 +123,10 @@ const char *dlssnr_runtime_device_name(const dlssnr_runtime *runtime) {
 }
 int dlssnr_runtime_set_model(dlssnr_runtime *runtime, dlssnr_model *model) {
     if (!runtime || !model) return DLSSNR_ERROR_INVALID_ARGUMENT;
+    dlssnr_stage1_inventory inventory;
+    if (dlssnr_model_stage1_inventory(model,&inventory) ||
+        inventory.present_required_tensors!=inventory.required_tensors)
+        return DLSSNR_ERROR_MODEL;
     runtime->model=model;
     return DLSSNR_OK;
 }
