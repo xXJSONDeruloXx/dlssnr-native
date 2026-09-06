@@ -9,7 +9,7 @@ all: build/libdlssnr-native.so build/dlssnr-inspect
 
 build/libdlssnr-native.so: $(SOURCES) $(HEADERS)
 	mkdir -p build
-	$(CC) $(CFLAGS) $(VULKAN_CFLAGS) -shared -Wl,-soname,libdlssnr-native.so.1 -o $@ $(SOURCES) -lvulkan -lm
+	$(CC) $(CFLAGS) $(VULKAN_CFLAGS) -shared -Wl,-soname,libdlssnr-native.so -o $@ $(SOURCES) -lvulkan -lm
 
 build/dlssnr-inspect: inspect.c dlssnr.h build/libdlssnr-native.so
 	$(CC) $(CFLAGS) -o $@ inspect.c -Lbuild -ldlssnr-native -Wl,-rpath,'$$ORIGIN'
