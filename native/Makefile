@@ -2,10 +2,13 @@ CC ?= cc
 VULKAN_CFLAGS ?=
 CFLAGS ?= -O2 -std=c11 -Wall -Wextra -fPIC
 
+SOURCES = runtime.c model_package.c dlssnr.c
+HEADERS = runtime.h model_package.h dlssnr.h
+
 all: build/libdlssnr-native.so
 
-build/libdlssnr-native.so: runtime.c runtime.h
+build/libdlssnr-native.so: $(SOURCES) $(HEADERS)
 	mkdir -p build
-	$(CC) $(CFLAGS) $(VULKAN_CFLAGS) -shared -o $@ runtime.c -lvulkan
+	$(CC) $(CFLAGS) $(VULKAN_CFLAGS) -shared -Wl,-soname,libdlssnr-native.so.1 -o $@ $(SOURCES) -lvulkan
 
 .PHONY: all
