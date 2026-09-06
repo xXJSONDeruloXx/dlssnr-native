@@ -38,6 +38,11 @@ int main(int argc, char **argv) {
     if (!dlssnr_stage1_profile_get(&profile))
         printf("stage1=%ux%u rgb frame=%u reset=%u\n",
                profile.width,profile.height,profile.frame,profile.reset);
+    dlssnr_stage1_inventory inventory;
+    if (!dlssnr_model_stage1_inventory(model,&inventory))
+        printf("stage1_tensors=%u/%u auxiliary=%u\n",
+               inventory.present_required_tensors,inventory.required_tensors,
+               inventory.auxiliary_tensors);
     if (device) {
         dlssnr_runtime *runtime=NULL;
         result=dlssnr_runtime_create(&runtime);
@@ -46,7 +51,15 @@ int main(int argc, char **argv) {
             dlssnr_model_close(model);
             return 3;
         }
+        result=dlssnr_runtime_set_model(runtime,model);
+        if (result) {
+            fprintf(stderr,"runtime_set_model=%d\n",result);
+            dlssnr_runtime_destroy(runtime);
+            dlssnr_model_close(model);
+            return 4;
+        }
         printf("device=%s\n",dlssnr_runtime_device_name(runtime));
+        printf("stage1_model_bound=1\n");
         dlssnr_runtime_destroy(runtime);
     }
     dlssnr_model_close(model);
