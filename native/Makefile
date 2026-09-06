@@ -2,8 +2,8 @@ CC ?= cc
 VULKAN_CFLAGS ?=
 CFLAGS ?= -O2 -std=c11 -Wall -Wextra -fPIC
 
-SOURCES = runtime.c model_package.c dlssnr.c
-HEADERS = runtime.h model_package.h dlssnr.h
+SOURCES = runtime.c model_package.c sha256.c dlssnr.c
+HEADERS = runtime.h model_package.h sha256.h dlssnr.h
 
 all: build/libdlssnr-native.so
 
