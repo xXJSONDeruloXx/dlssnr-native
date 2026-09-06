@@ -203,7 +203,7 @@ const void *nr_model_package_tensor(const nr_model_package *model, const char *n
     uint32_t lo=0,hi=NR_MODEL_TENSORS;
     while (lo<hi) {
         uint32_t mid=lo+(hi-lo)/2;
-        nr_tensor_entry *entry=&model->entries[mid];
+        const nr_tensor_entry *entry=&model->entries[mid];
         int cmp=span_compare(name,(uint16_t)(n>UINT16_MAX?UINT16_MAX:n),
                              entry->name,entry->name_len);
         if (!cmp && n<=UINT16_MAX)
