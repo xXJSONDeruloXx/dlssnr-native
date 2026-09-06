@@ -17,11 +17,14 @@ jobs:
           sudo apt-get install -y build-essential libvulkan-dev glslc
       - name: Run host tests
         run: make test
-      - name: Build shared runtime
-        run: make -C native
+      - name: Build shared runtime and probe
+        run: make
       - name: Inspect exported ABI
         run: |
           test -f native/build/libdlssnr-native.so
           nm -D --defined-only native/build/libdlssnr-native.so | grep ' dlssnr_abi_version$'
           nm -D --defined-only native/build/libdlssnr-native.so | grep ' dlssnr_model_open$'
-          nm -D --defined-only native/build/libdlssnr-native.so | grep ' dlssnr_runtime_create$'
+          nm -D --defined-only native/build/libdlssnr-native.so | grep ' dlssnr_runtime_create
+          nm -D --defined-only native/build/libdlssnr-native.so | grep ' dlssnr_model_stage1_inventory
+      - name: Package release
+        run: python3 package.py
